@@ -1,10 +1,10 @@
-# ROS2 For Unity - Ubuntu 20.04 and 22.04
+# ROS2 For Unity - Android
 
-This readme contains information specific to Ubuntu 20.04/22.04. For general information, please see [README.md](README.md)
+This readme contains information specific to 22.04. For general information, please see [README.md](README.md)
 
 ## Building
 
-We assume that working directory is `~/ros2-for-unity` and we are using `ROS2 galactic` (replace with `foxy` or `humble` or `jazzy` where applicable).
+We assume that working directory is `~/ros2-for-unity` and we are using `ROS2 jazzy` .
 
 ### Prerequisites
 
@@ -14,7 +14,7 @@ Start with installation of dependencies. Make sure to complete each step of `ros
 
 * Clone this project.
     ```bash
-    git clone git@github.com:RobotecAI/ros2-for-unity.git ~/ros2-for-unity
+    git clone https://github.com/Kotakku/ros2-for-unity-jazzy
     ```
 * You need to source your ROS2 installation before you proceed, for each new open terminal. It is convenient to include this command in your `~/.profile` file.
     ```bash
@@ -28,24 +28,29 @@ Start with installation of dependencies. Make sure to complete each step of `ros
 * Set up you custom messages in `ros2_for_unity_custom_messages.repos`
 * Import necessary and custom messages repositories.
     ```bash
-    ./pull_repositories.sh
+    ./pull_repositories_android.sh
     ```
-    > *NOTE* `pull_repositories.sh` script doesn't update already existing repositories, you have to remove `src/ros2cs` folder to re-import new versions.
+    > *NOTE* `pull_repositories_android.sh` script doesn't update already existing repositories, you have to remove `src/ros2cs` folder to re-import new versions.
 * Build `Ros2ForUnty`. You can build it in standalone or overlay mode.
     ```bash
-    # standalone mode
-    ./build.sh --standalone
-    
-    # overlay mode
-    ./build.sh
+    ./build_android.sh -p <your-path-to-Android-NDK>
     ```
+    * e.g. `./build_android.sh -p /home/<user>/Unity/Hub/Editor/202x.x.xx/Editor/Data/PlaybackEngines/AndroidPlayer/NDK`
     * You can add `--clean-install` flag to make sure your installation directory is cleaned before deploying.
 * Unity Asset is ready to import into your Unity project. You can find it in `install/asset/` directory.
 * (optionally) To create `.unitypackage` in `install/unity_package`
     ```bash
-    create_unity_package.sh -u <your-path-to-unity-editor-executable>
+    ./create_unity_package.sh -u <your-path-to-unity-editor-executable>
     ```
+    * e.g. `./create_unity_package.sh -p /home/<user>/Unity/Hub/Editor/202x.x.xx/Editor/Unity`
     > *NOTE* Unity license is required. 
+
+## Unity Build Settings
+Change the following in `Player Settings...`
+
+* Change `Scripting Backend` to `IL2CPP`
+* Check `ARM64` under `Target Architectures`
+* Change `Internet Access` to `Require`
 
 ## OS-Specific usage remarks
 

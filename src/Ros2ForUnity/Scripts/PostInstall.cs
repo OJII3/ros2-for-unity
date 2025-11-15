@@ -34,6 +34,12 @@ internal class PostInstall : IPostprocessBuildWithReport
     public int callbackOrder { get { return 0; } }
     public void OnPostprocessBuild(BuildReport report)
     {
+        if (EditorUserBuildSettings.activeBuildTarget == BuildTarget.Android) {
+            // For Android, skip the post-install copy as files are embedded in the APK/AAB
+            Debug.Log("Android build detected. Skipping metadata file copy.");
+            return;
+        }
+
         var r2fuMetadataName = "metadata_ros2_for_unity.xml";
         var r2csMetadataName = "metadata_ros2cs.xml";
 

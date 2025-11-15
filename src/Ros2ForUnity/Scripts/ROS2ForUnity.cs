@@ -35,7 +35,8 @@ internal class ROS2ForUnity
     public enum Platform
     {
         Windows,
-        Linux
+        Linux,
+        Android
     }
     
     public static Platform GetOS()
@@ -47,6 +48,10 @@ internal class ROS2ForUnity
         else if (Application.platform == RuntimePlatform.WindowsEditor || Application.platform == RuntimePlatform.WindowsPlayer)
         {
             return Platform.Windows;
+        }
+        else if (Application.platform == RuntimePlatform.Android)
+        {
+            return Platform.Android;
         }
         throw new System.NotSupportedException("Only Linux and Windows are supported");
     }
@@ -63,8 +68,10 @@ internal class ROS2ForUnity
                 return "Linux";
             case Platform.Windows:
                 return "Windows";
+            case Platform.Android:
+                return "Android";
             default:
-                throw new System.NotSupportedException("Only Linux and Windows are supported");
+                throw new System.NotSupportedException("Only Linux, Android and Windows are supported");
         }
     }
     
@@ -203,7 +210,7 @@ internal class ROS2ForUnity
     /// </summary>
     private void CheckROSSupport(string ros2Codename)
     {
-        List<string> supportedVersions = new List<string>() { "foxy", "galactic", "humble", "rolling" };
+        List<string> supportedVersions = new List<string>() { "foxy", "galactic", "humble", "jazzy", "rolling" };
         var supportedVersionsString = String.Join(", ", supportedVersions);
         if (string.IsNullOrEmpty(ros2Codename))
         {
@@ -266,8 +273,15 @@ internal class ROS2ForUnity
         char separator = Path.DirectorySeparatorChar;
         try
         {
+#if UNITY_ANDROID
+            TextAsset xmlAsset = (TextAsset)Resources.Load("metadata_ros2cs");
+            ros2csMetadata.LoadXml(xmlAsset.text);
+            xmlAsset = (TextAsset)Resources.Load("metadata_ros2_for_unity");
+            ros2ForUnityMetadata.LoadXml(xmlAsset.text);
+#else
             ros2csMetadata.Load(GetPluginPath() + separator + "metadata_ros2cs.xml");
             ros2ForUnityMetadata.Load(GetRos2ForUnityPath() + separator + "metadata_ros2_for_unity.xml");
+#endif
         }
         catch (System.IO.FileNotFoundException)
         {
@@ -297,6 +311,10 @@ internal class ROS2ForUnity
         if (GetOS() == Platform.Windows) {
             // Windows version can run standalone, modifies PATH to ensure all plugins visibility
             SetEnvPathVariable();
+        } else if (GetOS() == Platform.Android) {
+            // Android: DllLoadUtilsAndroid will handle library loading from system paths
+            // Native libraries are automatically extracted to /data/app/.../lib/arm64-v8a/
+            ROS2.GlobalVariables.absolutePath = "";
         } else {
             // For foxy, it is necessary to use modified version of librcpputils to resolve custom msgs packages.
             ROS2.GlobalVariables.absolutePath = GetPluginPath() + "/";
