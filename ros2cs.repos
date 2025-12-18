@@ -1,5 +1,5 @@
 repositories:
   src/ros2cs/:
     type: git
-    url:     https://github.com/Kotakku/ros2cs.git
+    url:     https://github.com/ojii3/ros2cs.git
     version: jazzy
